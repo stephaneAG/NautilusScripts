@@ -1,0 +1,30 @@
+#!/bin/sh
+# nautilus_bash_script: does something
+# blablabla
+
+# TODO:
+# blablabla
+
+# won't appear if ran from context menu instead of a terminal window
+#echo "bash_script says Hello Wolrd !"
+
+# we have two easy alternatives:
+# 'll appear in a popup window
+zenity --info --text="Hello World"
+# 'll appear as a notification
+# also, check the icons available: ls /usr/share/pixmaps/*.png ( & pxm )
+# R: to call viewer from a term: eog / "dpkg-open" / feh / w3m
+notify-send "A Title" "Hello World" -i /usr/share/pixmaps/debian-logo.png
+
+
+# Variables automatically made available to our scripts by Nautilus:
+# newline-delimited paths for selected files (local only)
+# NAUTILUS_SCRIPT_SELECTED_FILE_PATHS
+# newline-delimited URIs for selected files
+# NAUTILUS_SCRIPT_SELECTED_URIS
+# current location
+# NAUTILUS_SCRIPT_CURRENT_URI
+# position and size of current window
+# NAUTILUS_SCRIPT_WINDOW_GEOMETRY
+
+# TODO: display the above variables using zenity
