@@ -1,0 +1,66 @@
+# R: the nautilus scripts files can reside in 2 different locations depending on OS/Nautilus version
+# from "https://help.ubuntu.com/community/NautilusScriptsHowto":
+# scripts directory => ~/.gnome2/nautilus-scripts
+# for my version of Ubuntu:
+# scripts directory => ~/.local/share/nautilus/scripts
+
+# R: a script's name may not appear automatically in the right-click menu
+#    if it's the case, just visit the scripts directory using the corresponding right-lick option
+
+# R: script also need to be marked as executables
+#    to do so, either:
+#    -> right-click=>properties=>Permissions=>Allow executing file as program
+#    -> chmod +x name_of_the_script
+
+# R: we can arrange our scripts more easily by creating sub directories in the script directory
+
+
+# Making a script:
+# the easiest way is to us Bash as scripting language, but can use others ( like Perl, Python, ..)
+
+
+
+# Whenever a script is called, Nautilus auto sets some variables available to our scripts!
+# 1: NAUTILUS_SCRIPT_SELECTED_FILE_PATHS => newline-delimited paths for selected files (local only)
+# 2: NAUTILUS_SCRIPT_SELECTED_URIS => newline-delimited URIs for selected files
+# 3: NAUTILUS_SCRIPT_CURRENT_URI => current location
+# 4: NAUTILUS_SCRIPT_WINDOW_GEOMETRY => position and size of current window
+#
+# Also, 
+#      the selected files can also be referred to with the more traditional "$@" and "$*" bash variables
+#      zenity application is a simple dialog box you can invoke from a shell script to give the users information or get information from the user
+
+
+# sample scripts can be seen at https://help.ubuntu.com/community/NautilusScriptsHowto/SampleScripts
+# infos about Nautilus scripts at http://g-scripts.sourceforge.net/
+# collection of scripts at http://mundogeek.net/nautilus-scripts/
+
+
+# ENJOY ! :D
+
+
+
+
+
+# ANNEX:
+
+
+Help! My script can't handle multiple files/files with spaces
+
+The biggest problem is to be able to handle multiple files with spaces. Many (but not all) of the scripts here are designed to be able to do this, but they require a little thought to construct correctly. Most of the scripts in the "File System Management" (cf. uppercase, lowercase, make-nautilus-script) section are robust for this. If you are not careful, your script will be unable to tell whether a filename with a space is a single file or multiple files. One way is to simply protecting the $@ variable with "$@". Another trick to process multiple files with spaces to use something like this:
+
+#!/bin/sh
+					for arg 
+					do
+					echo "$arg"   #"$arg" must be protected with quotes
+					done
+					
+This can make it tricky to invoke a single command on all the files at once, and so you may need to iteratively build the commands arguments with a temporary variable. Another solution is to process the input filenames with sed, like this:
+					
+					files=`echo "$1" | sed 's/ /\\ /g'`
+					
+Some people have found that the above do not work well in all cases. Paolo Bacch suggested the following:
+					#!/bin/sh
+					quoted=$(echo -e "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS" | awk 'BEGIN {
+					FS = "\n" } { printf "\"%s\" ", $1 }' | sed -e s#\"\"##)
+					eval "your-program $quoted"
